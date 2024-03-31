@@ -9,7 +9,7 @@ In computer science, we often encounter divide and conquer algorithms, which ope
 ## Definitions
 
 1. **Composer**: An individual responsible for creating orchestrations.
-2. **Orchestration**: A hierarchical structure comprising AI teams, AI agents, application services, and settings, facilitating the collaboration of AI agents to solve complex problems. Orchestration enables the implementation of [Agent Swarms](https://github.com/daveshap/OpenAI_Agent_Swarm).
+2. **Orchestration**: A hierarchical structure comprising AI teams, AI agents, application services, LLMs, and settings, facilitating the collaboration of AI agents to solve complex problems. Orchestration enables the implementation of [Agent Swarms](https://github.com/daveshap/OpenAI_Agent_Swarm).
 3. **AI Team**: A collection of AI agents focused on solving a specific subset of the problem.
 4. **AI Agent**: A team member tasked with performing its designated function. Agents can be single-layered or multilayered. In multilayered agents, inter-layer communication occurs via north and south bound buses. Application services are accessible only to the lowest layer.
 5. **Application Services**: Using LLM function calls, agents can access various applications such as Github, Gmail, Zoho, Slack, Discord, etc. The Ganama VM API itself can serve as an application service, enabling teams to modify themselves.
