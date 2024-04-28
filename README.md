@@ -41,10 +41,10 @@ In computer science, we often encounter divide and conquer algorithms, which ope
         |
         |
     Ganama CLI ----------------> Local auth service
-                    |              ^
-                    |     +--------|
-                    V     |
-Ganama Web -----> Ganama VM ------> Script Engine (LLMs and Application Services) -----> Internet APIs (HTTP, SMTP, IMAP, etc)
+            ^       |              ^
+            |       |     +--------|
+            |       V     |
+Ganama Web -+     Ganama VM ------> Script Engine (LLMs and Application Services) -----> Internet APIs (HTTP, SMTP, IMAP, etc)
                        |                |                           
                        |                |
                        |                |--> System APIs (File system, Audio, Graphics, etc)
