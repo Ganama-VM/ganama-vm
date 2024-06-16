@@ -4,6 +4,35 @@ const { loadFront } = ymlFrontMatter;
 
 const applications = [];
 const services = [];
+let settings = {};
+
+const SETTINGS_FILE = "/ganama/settings.json";
+
+export function getSettings() {
+  if (settings) {
+    return settings;
+  } else {
+    try {
+      settings = JSON.parse(fs.readFileSync(SETTINGS_FILE).toString());
+      return settings;
+    } catch (error) {
+      return {};
+    }
+  }
+}
+
+export function setSettingForService(serviceUniqueId, key, value) {
+  const currentServiceSettings = settings[serviceUniqueId] ?? {};
+  currentServiceSettings[key] = value;
+
+  settings[serviceUniqueId] = currentServiceSettings;
+  const settingsJson = JSON.stringify(settings);
+  fs.writeFileSync(SETTINGS_FILE, settingsJson, { flag: "w" });
+}
+
+export function getSettingsForService(serviceUniqueId) {
+  return settings[serviceUniqueId] ?? {};
+}
 
 function getApplications() {
   if (applications) {
@@ -68,6 +97,7 @@ function getLayerFunctions(serviceUniqueIds) {
 async function infer(layerContent, message, layerFunctions, llmService) {
   const response = await fetch(`${llmService.appUrl}/llms/${llmService.id}`, {
     body: JSON.stringify({
+      settings: getSettingsForService(llmService.uniqueId),
       context: layerContent,
       message,
       functions: layerFunctions.map((func) => {
