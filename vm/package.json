@@ -1,0 +1,16 @@
+{
+  "name": "ganame-vm",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Handles inference, conversations, etc",
+  "main": "index.js",
+  "author": "Batandwa Mgutsi",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.19.2",
+    "yaml-front-matter": "^4.1.1"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}

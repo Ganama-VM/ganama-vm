@@ -66,3 +66,13 @@ The only API The VM exposes for now, is the webhooks API (Since there is no Auth
 - [ ] My agents can send and receive emails (with attachments) via Gmail. Conversations are maintained and the agents can be multilayered.
 - [ ] My agents can set reminders and be notified when it's time for those reminders to be executed. They should also be able to save files in the file system for their own records (e.g if agent needs to keep folders for the customers it interacts with). There should also be a shared file system that can be pre-populated with files (i.e upon uploading of orchestration). The orchestrator can specify which agents or teams have access to which files and folders in the shared file system. This is how we will allow agents to be aware of company policies, for example.
 - [ ] Create an orchestration that runs an actual business with actual customers but run entirely by agents. This is just to have a benchmark.
+
+## Application API
+
+1. /services returns the services provided by this application. Each service has a type which can be llm or application service. If application service, then the service API should be under /services/{service_id}/api. If llm then /llms/{llm_id} is the API of the LLM in question.
+2. LLMs provide a predefined API. with POST /message used to post messages to the LLM. The body also includes the services the given agent layer has access to. The service objects will have have endpoint to the API for the service which is to be used as the request prefix. As well as the functions that service provides. A function has a name, the endpoint path, the parameters it takes, as well as the HTTP method it should be called by. Each parameter has a name, the type (integer, real number or string) as well as a description of the parameter.
+3. Application services on the other hand provide their own API. The API is just a flat array of functions whose schema is as defined above.
+4. Application webhooks are available at /webhooks/${app_id}/{web_hook_name}. The reason to place them on the application is so that it is up to the application to route the webhook event to the correct service. Or even multiple services.
+5. First layer is 0, second layer is 1, third layer is 2, and so on.
+6. The id for an agent is teamName.agentName
+7. Messaging a layer specify a layer id for the agent: teamName.agentName-0
