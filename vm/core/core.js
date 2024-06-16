@@ -8,7 +8,7 @@ let settings = {};
 
 const SETTINGS_FILE = "/ganama/settings.json";
 
-export function getSettings() {
+function getSettings() {
   if (settings) {
     return settings;
   } else {
@@ -21,13 +21,28 @@ export function getSettings() {
   }
 }
 
-export function setSettingForService(serviceUniqueId, key, value) {
-  const currentServiceSettings = settings[serviceUniqueId] ?? {};
-  currentServiceSettings[key] = value;
+export async function getServiceDefaultSettings(service) {
+  const response = await fetch(
+    `${service.appUrl}/services/${services.id}/default-settings`
+  );
+  if (response.ok) {
+    return response.json();
+  } else {
+    return {};
+  }
+}
 
-  settings[serviceUniqueId] = currentServiceSettings;
+function setSettingsForService(serviceUniqueId, serviceSettings) {
+  settings[serviceUniqueId] = serviceSettings;
   const settingsJson = JSON.stringify(settings);
   fs.writeFileSync(SETTINGS_FILE, settingsJson, { flag: "w" });
+}
+
+export function setSettingForService(serviceUniqueId, key, value) {
+  const currentServiceSettings = getSettingsForService(serviceUniqueId);
+  currentServiceSettings[key] = value;
+
+  setSettingsForService(serviceUniqueId, currentServiceSettings);
 }
 
 export function getSettingsForService(serviceUniqueId) {
@@ -62,7 +77,16 @@ async function loadServicesForApp(application) {
 
 export async function loadServices() {
   const promises = getApplications().map(loadServicesForApp);
-  return Promise.all(promises);
+  await Promise.all(promises);
+
+  const settings = getSettings();
+  for (const service of services) {
+    const defaultSettings = await getServiceDefaultSettings(service);
+    settings[service.uniqueId] = {
+      ...defaultSettings,
+      ...(settings[service.uniqueId] ?? {}),
+    };
+  }
 }
 
 function getLlmServiceWithId(uniqueId) {
@@ -109,6 +133,7 @@ async function infer(layerContent, message, layerFunctions, llmService) {
     }),
     method: "POST",
     headers: {
+      "X-ApplicationId": llmService.applicationId,
       "Content-Type": "application/json",
     },
   });
