@@ -1,0 +1,30 @@
+name: Publish VM
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'vm/*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v3
+
+      - name: Login to docker hub
+        run: |
+          sudo docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build docker image
+        run: |
+          cd vm
+          sudo docker build -t ${{ secrets.DOCKER_USERNAME }}/ganama-vm .
+
+      - name: Publish image to Docker-hub
+        run: |
+          cd vm
+          sudo docker push ${{ secrets.DOCKER_USERNAME }}/ganama-vm:latest
