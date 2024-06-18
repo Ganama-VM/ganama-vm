@@ -6,7 +6,7 @@ const applications = [];
 const services = [];
 let settings = {};
 
-const SETTINGS_FILE = "/ganama/settings.json";
+const SETTINGS_FILE = "/ganama/.ganama/settings.json";
 
 function getSettings() {
   if (settings) {
@@ -54,7 +54,7 @@ function getApplications() {
     return applications;
   } else {
     applications.push(
-      ...JSON.parse(fs.readFileSync("/ganama/config.json").toString())
+      ...JSON.parse(fs.readFileSync("/ganama/.ganama/config.json").toString())
         .applications
     );
   }
@@ -101,7 +101,7 @@ function getLlmServiceWithId(uniqueId) {
 
 function getAgentLayer(team, agent, layerNr) {
   const layer = fs.readFileSync(
-    `/ganama/orchestration/${team}/${agent}/${layerNr}.md`
+    `/ganama/${team}/${agent}/${layerNr}.md`
   );
   return loadFront(layer);
 }

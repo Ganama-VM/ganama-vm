@@ -8,7 +8,9 @@ environment:
 
 # Add regular dependencies here.
 dependencies:
-  # path: ^1.8.0
+  front_matter_ml: ^1.2.0
+  path: ^1.8.0
+  yaml_writer: ^2.0.0
 
 dev_dependencies:
   lints: ^3.0.0

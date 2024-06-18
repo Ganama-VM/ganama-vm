@@ -81,6 +81,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  front_matter_ml:
+    dependency: "direct main"
+    description:
+      name: front_matter_ml
+      sha256: "02ecfd23e0cc92f19d364a1f6ee2b902a855e179d5b80b412dd01710be8131d5"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.0"
   frontend_server_client:
     dependency: transitive
     description:
@@ -186,7 +194,7 @@ packages:
     source: hosted
     version: "2.1.0"
   path:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: path
       sha256: "087ce49c3f0dc39180befefc60fdb4acd8f8620e5682fe2476afd0b3688bb4af"
@@ -377,5 +385,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.1.2"
+  yaml_writer:
+    dependency: "direct main"
+    description:
+      name: yaml_writer
+      sha256: f182931a598f9a3fd29ff528f0caab98fffa713583e30c12c7a27ce0b66c1308
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
 sdks:
   dart: ">=3.3.4 <4.0.0"
