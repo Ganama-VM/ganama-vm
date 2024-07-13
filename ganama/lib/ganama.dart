@@ -68,7 +68,7 @@ void ensureApplicationFoldersExist(List<Application> applications) {
 
 Future<Map<String, dynamic>> buildComposeJson(
     List<Application> applications) async {
-  final vmPort = await getOpenPort();
+  final vmPort = 3002;
 
   return {
     "version": '3',
@@ -91,6 +91,7 @@ Future<Map<String, dynamic>> buildComposeJson(
         "volumes": [
           "../:/ganama",
         ],
+        "ports": ['$vmPort:$vmPort'],
         "environment": ['PORT=$vmPort'],
         "depends_on": applications
             .map(
