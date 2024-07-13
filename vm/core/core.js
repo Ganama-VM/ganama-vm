@@ -1,12 +1,14 @@
 import fs from "fs";
+import { join } from "path";
 import ymlFrontMatter from "yaml-front-matter";
 const { loadFront } = ymlFrontMatter;
 
-const applications = [];
-const services = [];
-let settings = {};
+let applications;
+let settings;
 
-const SETTINGS_FILE = "/ganama/.ganama/settings.json";
+const services = [];
+
+const SETTINGS_FILE = join("ganama", ".ganama", "settings.json");
 
 function getSettings() {
   if (settings) {
@@ -53,10 +55,9 @@ function getApplications() {
   if (applications) {
     return applications;
   } else {
-    applications.push(
-      ...JSON.parse(fs.readFileSync("/ganama/.ganama/config.json").toString())
-        .applications
-    );
+    const path = join(process.cwd(), "ganama", ".ganama", "config.json");
+    applications = JSON.parse(fs.readFileSync(path).toString()).applications;
+    return applications;
   }
 }
 
@@ -100,9 +101,7 @@ function getLlmServiceWithId(uniqueId) {
 }
 
 function getAgentLayer(team, agent, layerNr) {
-  const layer = fs.readFileSync(
-    `/ganama/${team}/${agent}/${layerNr}.md`
-  );
+  const layer = fs.readFileSync(join("ganama", team, agent, `${layerNr}.md`));
   return loadFront(layer);
 }
 
@@ -153,4 +152,8 @@ export async function messageLayer(team, agent, layerNr, message) {
 
     return infer(layer.__content, message, layerFunctions, llmService);
   }
+}
+
+export function getServices() {
+  return services;
 }
