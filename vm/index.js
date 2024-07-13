@@ -21,16 +21,14 @@ apiRouter.get("/settings/:serviceUniqueId", (req, res) => {
   res.status(200).json(getSettingsForService(req.params.serviceUniqueId));
 });
 
-apiRouter.post("/settings/:serviceUniqueId/:key", (req, res) => {
-  res
-    .status(200)
-    .json(
-      setSettingForService(
-        req.params.serviceUniqueId,
-        req.params.key,
-        req.body.value
-      )
-    );
+apiRouter.post("/settings/:serviceUniqueId/:key", async (req, res) => {
+  setSettingForService(
+    req.params.serviceUniqueId,
+    req.params.key,
+    req.body.value
+  );
+
+  res.status(200).send();
 });
 
 apiRouter.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {

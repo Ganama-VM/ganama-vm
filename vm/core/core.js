@@ -23,9 +23,20 @@ function getSettings() {
   }
 }
 
+function notifyServiceSettingsChanged(serviceUniqueId, newSettings) {
+  const service = services.find(service => service.uniqueId === serviceUniqueId);
+  return fetch(`${service.appUrl}/services/${service.id}/settings`, {
+    method: 'POST',
+    body: JSON.stringify(newSettings),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  });
+}
+
 export async function getServiceDefaultSettings(service) {
   const response = await fetch(
-    `${service.appUrl}/services/${services.id}/default-settings`
+    `${service.appUrl}/services/${service.id}/default-settings`
   );
   if (response.ok) {
     return response.json();
@@ -45,6 +56,7 @@ export function setSettingForService(serviceUniqueId, key, value) {
   currentServiceSettings[key] = value;
 
   setSettingsForService(serviceUniqueId, currentServiceSettings);
+  return notifyServiceSettingsChanged(serviceUniqueId, currentServiceSettings);
 }
 
 export function getSettingsForService(serviceUniqueId) {
@@ -71,6 +83,12 @@ async function loadServicesForApp(application) {
         applicationId: application.id,
         appUrl: application.url,
         uniqueId: `${application.id}.${service.id}`,
+        functions: service.functions.map((func) => {
+          return {
+            ...func,
+            url: `${application.url}/${func.path}`,
+          };
+        }),
       };
     })
   );
@@ -132,7 +150,7 @@ async function infer(layerContent, message, layerFunctions, llmService) {
     }),
     method: "POST",
     headers: {
-      "X-ApplicationId": llmService.applicationId,
+      "X-ServiceUniqueId": llmService.uniqueId,
       "Content-Type": "application/json",
     },
   });
