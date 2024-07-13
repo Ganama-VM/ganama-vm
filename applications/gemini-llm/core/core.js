@@ -4,7 +4,7 @@ let genAI;
 let models = new Map();
 
 export async function getGenAI(serviceUniqueId) {
-  const settingsEndpoint = `http://localhost:${process.env.VM_PORT}/settings/${serviceUniqueId}`;
+  const settingsEndpoint = `http://ganama-vm:${process.env.VM_PORT}/settings/${serviceUniqueId}`;
   const response = await fetch(settingsEndpoint);
   const settings = response.json();
 

@@ -4,7 +4,7 @@ class Application {
 
   Application(this.applicationId, this.port);
 
-  get url => 'http://localhost:$port';
+  get url => 'http://$safeDockerServiceName:$port';
 
   get safeDockerServiceName => applicationId.replaceAll(RegExp(r'/|\:'), '-');
 }
