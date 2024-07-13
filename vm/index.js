@@ -1,28 +1,27 @@
 import {
-  getSettings,
+  getServices,
   getSettingsForService,
   loadServices,
   messageLayer,
   setSettingForService,
 } from "./core/core.js";
-import express from "express";
+import express, { Router } from "express";
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3002;
 
 const app = express();
 
-app.use(express.json());
+const apiRouter = Router();
 
-app.get("/settings", async (_req, res) => {
-  res.status(200).json(getSettings());
+apiRouter.get("/services", (_, res) => {
+  res.status(200).json(getServices());
 });
 
-app.get("/settings/:serviceUniqueId", (req, res) => {
+apiRouter.get("/settings/:serviceUniqueId", (req, res) => {
   res.status(200).json(getSettingsForService(req.params.serviceUniqueId));
 });
 
-app.post("/settings/:serviceUniqueId/:key", (req, res) => {
-  setSettingForService(req.params.serviceUniqueId);
+apiRouter.post("/settings/:serviceUniqueId/:key", (req, res) => {
   res
     .status(200)
     .json(
@@ -34,7 +33,7 @@ app.post("/settings/:serviceUniqueId/:key", (req, res) => {
     );
 });
 
-app.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {
+apiRouter.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {
   try {
     const response = await messageLayer(
       req.params.teamId,
@@ -46,9 +45,13 @@ app.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: error?.message ?? "An unknown error occurre.d" });
+      .json({ message: error?.message ?? "An unknown error occurred" });
   }
 });
+
+app.use(express.json());
+app.use("/api", apiRouter);
+app.use("/", express.static("./public"));
 
 (async () => {
   await loadServices();
