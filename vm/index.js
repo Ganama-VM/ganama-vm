@@ -1,59 +1,23 @@
-import {
-  getServices,
-  getSettingsForService,
-  loadServices,
-  messageLayer,
-  setSettingForService,
-} from "./core/core.js";
-import express, { Router } from "express";
+import { loadServices } from "./core/core.js";
+import express from "express";
+import { webhooksRouter } from "./webhooks.router.js";
+import { apiRouter } from "./api.router.js";
 
-const PORT = process.env.PORT || 3002;
-
-const app = express();
-
-const apiRouter = Router();
-
-apiRouter.get("/services", (_, res) => {
-  res.status(200).json(getServices());
-});
-
-apiRouter.get("/settings/:serviceUniqueId", (req, res) => {
-  res.status(200).json(getSettingsForService(req.params.serviceUniqueId));
-});
-
-apiRouter.post("/settings/:serviceUniqueId/:key", async (req, res) => {
-  setSettingForService(
-    req.params.serviceUniqueId,
-    req.params.key,
-    req.body.value
-  );
-
-  res.status(200).send();
-});
-
-apiRouter.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {
-  try {
-    const response = await messageLayer(
-      req.params.teamId,
-      req.params.agent,
-      req.params.layerNr,
-      req.body.message
-    );
-    res.status(200).send(response);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: error?.message ?? "An unknown error occurred" });
-  }
-});
-
-app.use(express.json());
-app.use("/api", apiRouter);
-app.use("/", express.static("./public"));
-
-(async () => {
+const main = async () => {
+  const PORT = process.env.PORT || 3002;
   await loadServices();
+
+  const app = express();
+
+  app.use("/webhooks", webhooksRouter);
+
+  app.use(express.json());
+  app.use("/api", apiRouter);
+  app.use("/", express.static("./public"));
+
   app.listen(PORT, () => {
     console.log(`Ganama cream ready. App listening on ${PORT}.`);
   });
-})();
+};
+
+main();

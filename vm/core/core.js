@@ -65,7 +65,7 @@ export function getSettingsForService(serviceUniqueId) {
   return settings[serviceUniqueId] ?? {};
 }
 
-function getApplications() {
+export function getApplications() {
   if (applications) {
     return applications;
   } else {
