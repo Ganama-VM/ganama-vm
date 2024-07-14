@@ -58,7 +58,7 @@ app.post("/llms/:modelId", async (req, res) => {
     ],
     req.body.functions,
   );
-  res.status(200).json({ response });
+  res.status(200).send(response);
 });
 
 app.listen(PORT, () => {

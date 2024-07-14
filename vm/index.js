@@ -39,7 +39,7 @@ apiRouter.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {
       req.params.layerNr,
       req.body.message
     );
-    res.status(200).json(response);
+    res.status(200).send(response);
   } catch (error) {
     res
       .status(500)
