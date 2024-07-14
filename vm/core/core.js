@@ -24,13 +24,15 @@ function getSettings() {
 }
 
 function notifyServiceSettingsChanged(serviceUniqueId, newSettings) {
-  const service = services.find(service => service.uniqueId === serviceUniqueId);
+  const service = services.find(
+    (service) => service.uniqueId === serviceUniqueId
+  );
   return fetch(`${service.appUrl}/services/${service.id}/settings`, {
-    method: 'POST',
+    method: "POST",
     body: JSON.stringify(newSettings),
     headers: {
-      "Content-Type": "application/json"
-    }
+      "Content-Type": "application/json",
+    },
   });
 }
 
@@ -119,8 +121,15 @@ function getLlmServiceWithId(uniqueId) {
 }
 
 function getAgentLayer(team, agent, layerNr) {
-  const layer = fs.readFileSync(join("ganama", team, agent, `${layerNr}.md`));
-  return loadFront(layer);
+  const folderPath = join("ganama", team, agent);
+  const filesInDir = fs.readdirSync(folderPath);
+  const layerFilename = filesInDir.sort()[layerNr];
+  if (layerFilename) {
+    const layer = fs.readFileSync(join(folderPath, layerFilename));
+    return loadFront(layer);
+  } else {
+    throw new Error("Could not find target layer");
+  }
 }
 
 function getLayerFunctions(serviceUniqueIds) {
