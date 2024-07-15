@@ -117,6 +117,7 @@ async function getModel(modelId, serviceUniqueId) {
 
 async function callFunction(topic, functionName, functions, body, identity) {
   const functionToCall = functions.find((func) => func.path === functionName);
+  console.log(functionToCall);
 
   let queryParams = "";
   if (functionToCall.method === "GET" && functionToCall.parameters) {
