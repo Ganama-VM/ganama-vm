@@ -8,7 +8,7 @@ let settings;
 
 const services = [];
 
-const SETTINGS_FILE = join("ganama", ".ganama", "settings.json");
+const SETTINGS_FILE = join("/ganama", ".ganama", "settings.json");
 
 function getSettings() {
   if (settings) {
@@ -123,7 +123,7 @@ function getLlmServiceWithId(uniqueId) {
 }
 
 function getAgentLayer(team, agent, layerNr) {
-  const folderPath = join("ganama", team, agent);
+  const folderPath = join("/ganama", team, agent);
   const filesInDir = fs.readdirSync(folderPath);
   const layerFilename = filesInDir.sort()[layerNr];
   if (layerFilename) {
@@ -185,7 +185,7 @@ export async function messageLayer(topic, team, agent, layerNumber, messages) {
   if (!layer.llm) {
     throw new Error("Given layer does not specify an LLM to infer with.");
   } else {
-    const llmService = getLlmServiceWithId(layer.llm);
+    const llmService = getLlmServiceWithId(layer.llm.replace("/", "-"));
 
     const layerFunctions = getLayerFunctions([
       ...(layer.services ?? []),
