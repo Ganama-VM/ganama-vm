@@ -1,5 +1,6 @@
 import express from "express";
 import { infer, onSettingsChanged } from "./core/core.js";
+import pThrottle from "p-throttle";
 
 const modelIds = ["gemini-1.5-flash", "gemini-1.0-pro", "gemini-1.5-pro"];
 
@@ -33,11 +34,23 @@ app.post("/services/:serviceId/settings", (req, res) => {
   res.status(200).send();
 });
 
+const throttledInfer = pThrottle({
+  limit: 1,
+  interval: 5000,
+})(infer);
+
 app.post("/llms/:modelId", async (req, res) => {
-  const serviceUniqueId = req.headers["X-ServiceUniqueId"];
-  const response = await infer(
+  const identity = {
+    topic: req.get("X-Topic"),
+    team: req.get("X-Team"),
+    agent: req.get("X-Agent"),
+    layerNumber: parseInt(req.get("X-LayerNumber")),
+    serviceUniqueId: req.get("X-ServiceUniqueId"),
+  };
+
+  const response = await throttledInfer(
     req.params.modelId,
-    serviceUniqueId,
+    identity,
     [
       {
         role: "user",
@@ -47,16 +60,18 @@ app.post("/llms/:modelId", async (req, res) => {
           },
         ],
       },
-      {
-        role: "user",
-        parts: [
-          {
-            text: req.body.message,
-          },
-        ],
-      },
+      ...req.body.messages.map((message) => {
+        return {
+          role: "user",
+          parts: [
+            {
+              text: message,
+            },
+          ],
+        };
+      }),
     ],
-    req.body.functions,
+    req.body.functions
   );
   res.status(200).send(response);
 });

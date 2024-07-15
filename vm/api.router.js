@@ -29,10 +29,11 @@ apiRouter.post("/settings/:serviceUniqueId/:key", async (req, res) => {
 apiRouter.post("/messages/:teamId/:agent/:layerNr", async (req, res) => {
   try {
     const response = await messageLayer(
+      req.get("X-Topic"),
       req.params.teamId,
       req.params.agent,
-      req.params.layerNr,
-      req.body.message
+      parseInt(req.params.layerNr),
+      req.body.messages
     );
     res.status(200).send(response);
   } catch (error) {
