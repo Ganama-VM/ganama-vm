@@ -2,7 +2,7 @@ const ganamaVmHost = `${process.env.VM_HOST ?? "ganama-vm"}:${
   process.env.VM_PORT ?? "3002"
 }`;
 
-const serviceUniqueId = "ganama-services.voice";
+const serviceUniqueId = "batandwaganama-ganama-services.voice";
 
 let sockets = [];
 

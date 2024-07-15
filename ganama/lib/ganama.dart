@@ -13,7 +13,7 @@ Future<int> getOpenPort() async {
 Future<List<String>> findAllServicesUsed([Directory? directory]) async {
   directory = directory ?? Directory.current;
 
-  final out = <String>["ganama-services.messaging"];
+  final out = <String>["batandwaganama/ganama-services.messaging"];
 
   for (final fileSystemEntity in await directory.list().toList()) {
     if (fileSystemEntity is Directory &&
@@ -24,6 +24,7 @@ Future<List<String>> findAllServicesUsed([Directory? directory]) async {
       final fileContent = await fileSystemEntity.readAsString();
       final doc = fm.parse(fileContent);
 
+      out.add(doc.data["llm"]);
       if (doc.data.keys.contains("services") &&
           doc.data["services"] is Iterable) {
         for (var iii = 0; iii < doc.data["services"].length; iii++) {
@@ -41,7 +42,7 @@ Future<List<String>> findAllServicesUsed([Directory? directory]) async {
 Future<List<Application>> getApplications() async {
   final services = await findAllServicesUsed();
   final applicationIds =
-      services.map((service) => service.split(".").first).toList();
+      services.map((service) => service.split(".").first).toSet().toList();
 
   final futures = applicationIds.map(
     (applicationId) => (() async {

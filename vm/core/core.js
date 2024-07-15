@@ -189,7 +189,7 @@ export async function messageLayer(topic, team, agent, layerNumber, messages) {
 
     const layerFunctions = getLayerFunctions([
       ...(layer.services ?? []),
-      "ganama-services.messaging",
+      "batandwaganama-ganama-services.messaging",
     ]);
 
     return infer(topic, layer.__content, messages, layerFunctions, llmService, {

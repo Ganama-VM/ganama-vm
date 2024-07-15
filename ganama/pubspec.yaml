@@ -1,6 +1,6 @@
 name: ganama
 description: The CLI for the Ganama VM. Allows for the creation and orchestrations.
-version: 0.1.0
+version: 0.1.2
 repository: https://github.com/Ganama-VM/ganama-vm
 
 environment:
@@ -15,3 +15,6 @@ dependencies:
 dev_dependencies:
   lints: ^3.0.0
   test: ^1.24.0
+
+executables:
+  ganama:
