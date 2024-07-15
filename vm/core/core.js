@@ -115,7 +115,10 @@ export async function loadServices() {
 
 function getLlmServiceWithId(uniqueId) {
   for (const service of services) {
-    if (service.type === "llm" && service.uniqueId === uniqueId) {
+    if (
+      service.type === "llm" &&
+      service.uniqueId === uniqueId.replace("/", "-")
+    ) {
       return service;
     }
   }
@@ -138,7 +141,9 @@ function getAgentLayer(team, agent, layerNr) {
 function getLayerFunctions(serviceUniqueIds) {
   const out = [];
   const layerServices = serviceUniqueIds.map((serviceUniqueId) =>
-    services.find((service) => service.uniqueId === serviceUniqueId)
+    services.find(
+      (service) => service.uniqueId === serviceUniqueId.replace("/", "-")
+    )
   );
   for (const layerService of layerServices) {
     out.push(...layerService.functions);
@@ -186,7 +191,7 @@ export async function messageLayer(topic, team, agent, layerNumber, messages) {
   if (!layer.llm) {
     throw new Error("Given layer does not specify an LLM to infer with.");
   } else {
-    const llmService = getLlmServiceWithId(layer.llm.replace("/", "-"));
+    const llmService = getLlmServiceWithId(layer.llm);
 
     const layerFunctions = getLayerFunctions([
       ...(layer.services ?? []),
