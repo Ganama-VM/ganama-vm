@@ -18,7 +18,8 @@ function getSettings() {
       settings = JSON.parse(fs.readFileSync(SETTINGS_FILE).toString());
       return settings;
     } catch (error) {
-      return {};
+      settings = {};
+      return settings;
     }
   }
 }
