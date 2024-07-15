@@ -1,15 +1,11 @@
 import { Router } from "express";
 import { getApplications } from "./core/core.js";
-import proxy from "express-http-proxy";
+import { createProxyMiddleware } from "http-proxy-middleware";
 
 export const webhooksRouter = Router();
 for (const application of getApplications()) {
-  webhooksRouter.use(
-    `/${application.id}/:path`,
-    proxy(application.url, {
-      proxyReqPathResolver: (req) => {
-        return `/hooks/${req.params.path}`;
-      },
-    })
-  );
+  webhooksRouter.use(`/${application.id}`, createProxyMiddleware({
+    target: `${application.url}/hooks`,
+    changeOrigin: true,
+  }));
 }
