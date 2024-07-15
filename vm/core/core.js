@@ -69,7 +69,7 @@ export function getApplications() {
   if (applications) {
     return applications;
   } else {
-    const path = join(process.cwd(), "ganama", ".ganama", "config.json");
+    const path = join("/ganama", ".ganama", "config.json");
     applications = JSON.parse(fs.readFileSync(path).toString()).applications;
     return applications;
   }
