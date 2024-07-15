@@ -1,5 +1,5 @@
 const socket = io("http://localhost:3002", {
-  path: "/webhooks/ganama-services/voice-io",
+  path: "/webhooks/batandwaganama-ganama-services/voice-io",
 });
 
 const SpeechRecognition =
