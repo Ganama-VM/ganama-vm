@@ -13,7 +13,7 @@ Future<int> getOpenPort() async {
 Future<List<String>> findAllServicesUsed([Directory? directory]) async {
   directory = directory ?? Directory.current;
 
-  final out = <String>[];
+  final out = <String>["ganama-services.messaging"];
 
   for (final fileSystemEntity in await directory.list().toList()) {
     if (fileSystemEntity is Directory &&
@@ -30,7 +30,7 @@ Future<List<String>> findAllServicesUsed([Directory? directory]) async {
           out.add(doc.data["services"][iii]);
         }
       } else {
-        // Layer does declare services
+        // Layer does not declare services
       }
     }
   }

@@ -62,7 +62,7 @@ export function setSettingForService(serviceUniqueId, key, value) {
 }
 
 export function getSettingsForService(serviceUniqueId) {
-  return settings[serviceUniqueId] ?? {};
+  return getSettings()[serviceUniqueId] ?? {};
 }
 
 export function getApplications() {
@@ -80,15 +80,17 @@ async function loadServicesForApp(application) {
   const servicesForApp = await response.json();
   services.push(
     ...servicesForApp.map((service) => {
+      const serviceUniqueId = `${application.id}.${service.id}`;
       return {
         ...service,
         applicationId: application.id,
         appUrl: application.url,
-        uniqueId: `${application.id}.${service.id}`,
+        uniqueId: serviceUniqueId,
         functions: service.functions.map((func) => {
           return {
             ...func,
-            url: `${application.url}/${func.path}`,
+            serviceUniqueId,
+            url: `${application.url}/services/${service.id}/api/${func.path}`,
           };
         }),
       };
@@ -138,18 +140,25 @@ function getLayerFunctions(serviceUniqueIds) {
     services.find((service) => service.uniqueId === serviceUniqueId)
   );
   for (const layerService of layerServices) {
-    out.push(layerService.functions);
+    out.push(...layerService.functions);
   }
 
   return out;
 }
 
-async function infer(layerContent, message, layerFunctions, llmService) {
+async function infer(
+  topic,
+  layerContent,
+  messages,
+  layerFunctions,
+  llmService,
+  identity
+) {
   const response = await fetch(`${llmService.appUrl}/llms/${llmService.id}`, {
     body: JSON.stringify({
       settings: getSettingsForService(llmService.uniqueId),
       context: layerContent,
-      message,
+      messages,
       functions: layerFunctions.map((func) => {
         return {
           ...func,
@@ -160,6 +169,10 @@ async function infer(layerContent, message, layerFunctions, llmService) {
     method: "POST",
     headers: {
       "X-ServiceUniqueId": llmService.uniqueId,
+      "X-Team": identity.team,
+      "X-Agent": identity.agent,
+      "X-LayerNumber": identity.layerNumber,
+      "X-Topic": topic,
       "Content-Type": "application/json",
     },
   });
@@ -167,17 +180,23 @@ async function infer(layerContent, message, layerFunctions, llmService) {
   return response.text();
 }
 
-export async function messageLayer(team, agent, layerNr, message) {
-  const layer = getAgentLayer(team, agent, layerNr);
+export async function messageLayer(topic, team, agent, layerNumber, messages) {
+  const layer = getAgentLayer(team, agent, layerNumber);
   if (!layer.llm) {
     throw new Error("Given layer does not specify an LLM to infer with.");
   } else {
     const llmService = getLlmServiceWithId(layer.llm);
-    const layerFunctions = layer.services
-      ? getLayerFunctions(layer.services)
-      : [];
 
-    return infer(layer.__content, message, layerFunctions, llmService);
+    const layerFunctions = getLayerFunctions([
+      ...(layer.services ?? []),
+      "ganama-services.messaging",
+    ]);
+
+    return infer(topic, layer.__content, messages, layerFunctions, llmService, {
+      team,
+      agent,
+      layerNumber,
+    });
   }
 }
 

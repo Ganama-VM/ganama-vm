@@ -1,5 +1,9 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 
+const ganamaVmHost = `${process.env.VM_HOST ?? "ganama-vm"}:${
+  process.env.VM_PORT ?? "3002"
+}`;
+
 let genAI;
 let models = new Map();
 
@@ -7,9 +11,9 @@ export async function getGenAI(serviceUniqueId) {
   if (genAI) {
     return genAI;
   } else {
-    const settingsEndpoint = `http://ganama-vm:${process.env.VM_PORT}/api/settings/${serviceUniqueId}`;
+    const settingsEndpoint = `http://${ganamaVmHost}/api/settings/${serviceUniqueId}`;
     const response = await fetch(settingsEndpoint);
-    const settings = response.json();
+    const settings = await response.json();
     onSettingsChanged(settings);
 
     return genAI;
@@ -21,10 +25,10 @@ export function onSettingsChanged(newSettings) {
   genAI = new GoogleGenerativeAI(newSettings.GOOGLE_API_KEY);
 }
 
-export async function infer(modelId, serviceUniqueId, messages, functions) {
+export async function infer(modelId, identity, messages, functions) {
   const nextMessages = [...messages];
 
-  const model = await getModel(modelId, serviceUniqueId);
+  const model = await getModel(modelId, identity.serviceUniqueId);
   const result = await model.generateContent({
     contents: nextMessages,
     tools: {
@@ -51,23 +55,30 @@ export async function infer(modelId, serviceUniqueId, messages, functions) {
 
       try {
         const functionCallResult = await callFunction(
+          identity.topic,
           functionCall.name,
           functions,
-          functionCall.args
+          functionCall.args,
+          identity,
         );
-        nextMessages.push({
-          role: "function",
-          parts: [
-            {
-              functionResponse: {
-                name: functionCall.name,
-                response: {
-                  response: functionCallResult,
+
+        if(functionCallResult === 'MESSAGE_RECEIVED') {
+          return functionCallResult;
+        } else {
+          nextMessages.push({
+            role: "function",
+            parts: [
+              {
+                functionResponse: {
+                  name: functionCall.name,
+                  response: {
+                    response: functionCallResult,
+                  },
                 },
               },
-            },
-          ],
-        });
+            ],
+          });
+        }
       } catch (e) {
         nextMessages.push({
           role: "function",
@@ -84,7 +95,7 @@ export async function infer(modelId, serviceUniqueId, messages, functions) {
         });
       }
 
-      return infer(modelId, serviceUniqueId, nextMessages, functions);
+      return infer(modelId, identity, nextMessages, functions);
     }
   } else {
     return result.response.text();
@@ -104,7 +115,7 @@ async function getModel(modelId, serviceUniqueId) {
   }
 }
 
-async function callFunction(functionName, functions, body) {
+async function callFunction(topic, functionName, functions, body, identity) {
   const functionToCall = functions.find((func) => func.path === functionName);
 
   let queryParams = "";
@@ -119,6 +130,11 @@ async function callFunction(functionName, functions, body) {
     body: functionToCall.method === "GET" ? undefined : JSON.stringify(body),
     headers: {
       "Content-Type": "application/json",
+      "X-ServiceUniqueId": functionToCall.serviceUniqueId,
+      "X-Team": identity.team,
+      "X-Agent": identity.agent,
+      "X-LayerNumber": identity.layerNumber,      
+      "X-Topic": topic,      
       Host: new URL(functionToCall.url).hostname,
     },
   });
