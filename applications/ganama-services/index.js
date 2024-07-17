@@ -8,6 +8,10 @@ import { Server } from "socket.io";
 import { createServer } from "node:http";
 import { addSocket } from "./voice/voice.service.js";
 import { voiceRouter, voiceServiceFunctions } from "./voice/voice.router.js";
+import {
+  sqlServerRouter,
+  sqlServerServiceFunctions,
+} from "./sql-server/sql-server.router.js";
 
 const app = express();
 const server = createServer(app);
@@ -27,11 +31,17 @@ app.get("/services", (_req, res) => {
       id: "voice",
       functions: voiceServiceFunctions,
     },
+    {
+      type: "application-service",
+      id: "sql-server",
+      functions: sqlServerServiceFunctions,
+    },
   ]);
 });
 
 app.use("/services/messaging", messagingRouter);
 app.use("/services/voice", voiceRouter);
+app.use("/services/sql-server", sqlServerRouter);
 
 app.use("/hooks/voice", express.static("./voice/public"));
 

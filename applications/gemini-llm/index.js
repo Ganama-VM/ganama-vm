@@ -35,8 +35,8 @@ app.post("/services/:serviceId/settings", (req, res) => {
 });
 
 const throttledInfer = pThrottle({
-  limit: 1,
-  interval: 5000,
+  limit: 360,
+  interval: 60_000,
 })(infer);
 
 app.post("/llms/:modelId", async (req, res) => {

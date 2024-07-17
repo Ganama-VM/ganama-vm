@@ -70,7 +70,8 @@ async function sendMessage(
     },
   })
     .then((response) => {
-      response.text().then(console.log);
+      console.log("Message to ", team, " ", agent, " ", layerNumber);
+      response.text().then(response => console.log("LLM Response:", response));
     })
     .catch(console.error);
 

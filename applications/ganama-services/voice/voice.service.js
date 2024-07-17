@@ -20,7 +20,7 @@ async function sendMessage(message) {
     method: "POST",
     body: JSON.stringify({ messages: [message] }),
     headers: {
-      "X-Topic": endpoint,
+      "X-Topic": Date.now(),
       "Content-Type": "application/json",
     },
   })
